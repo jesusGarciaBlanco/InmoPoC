@@ -43,6 +43,7 @@ kotlin {
 
             implementation(projects.core.navigation)
             implementation(projects.resources)
+            implementation(projects.features.registerApi)
         }
 
         commonTest.dependencies {

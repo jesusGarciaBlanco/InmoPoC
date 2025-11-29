@@ -32,10 +32,13 @@ class Navigator(
             }
             stacksInUse.flatMap { state.backStacks[it] ?: emptyList() }.toMutableStateList()
         } else {
-            listOf(loginRoute).toMutableStateList()
+            state.backStacks[loginRoute]?.toMutableStateList() ?: mutableStateListOf(loginRoute)
         }
 
     init {
+        if (state.backStacks[loginRoute] == null) {
+            state.backStacks[loginRoute] = mutableStateListOf(loginRoute)
+        }
         // Initial logic to force login if necessary.
         handleInitialLoginCheck()
     }
@@ -50,7 +53,6 @@ class Navigator(
      * Navigates to a destination. This is the main method that should be called.
      */
     fun navigateTo(destination: Route) {
-        // --- 1. Authentication Logic ---
         if (destination.requiresLogin && !isLoggedIn) {
             onLoginSuccessRoute = destination
             // We don't need to do anything else; `combinedBackStack` will already return only the loginRoute.
@@ -67,7 +69,8 @@ class Navigator(
             state.currentTopLevelRoute = destination
         } else {
             // It's a detail route, we add it to the active tab's stack.
-            state.backStacks[state.currentTopLevelRoute]?.add(destination)
+            val stackToModify = if (isLoggedIn) state.currentTopLevelRoute else loginRoute
+            state.backStacks[stackToModify]?.add(destination)
         }
     }
 

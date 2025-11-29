@@ -44,6 +44,7 @@ kotlin {
             implementation(projects.features.login)
             implementation(projects.features.home)
             implementation(projects.features.profile)
+            implementation(projects.features.register)
             implementation(projects.core.navigation)
             implementation(projects.resources)
 

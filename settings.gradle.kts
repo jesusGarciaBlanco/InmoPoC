@@ -39,4 +39,6 @@ include(":core:navigation")
 include(":features:login")
 include(":features:profile")
 include(":features:home")
+include(":features:register")
+include(":features:register-api")
 

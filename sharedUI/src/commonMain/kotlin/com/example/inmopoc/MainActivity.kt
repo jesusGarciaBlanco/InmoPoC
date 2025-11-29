@@ -20,6 +20,7 @@ import com.example.navigation.TopLevelNav
 import com.example.navigation.navigationModule
 import com.example.profile.api.ProfileRoute
 import com.example.profile.di.profileModule
+import com.example.register.di.registerModule
 import com.example.resources.Res
 import com.example.resources.arrow_back
 import org.jetbrains.compose.resources.vectorResource
@@ -42,13 +43,10 @@ fun App(
             loginModule,
             homeModule,
             profileModule,
+            registerModule,
         )
     }) {
         val navigator: Navigator = koinInject()
-
-        LaunchedEffect(Unit) {
-            navigator.login() // Llama a login() al iniciar la app
-        }
 
         val backStack = navigator.combinedBackStack
         val currentScreen = backStack.lastOrNull()
