@@ -3,6 +3,7 @@ package com.example.inmopoc
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
@@ -14,6 +15,7 @@ import com.example.inmopoc.theme.AppTheme
 import com.example.login.api.LoginRoute
 import com.example.login.di.loginModule
 import com.example.navigation.Navigator
+import com.example.navigation.Route
 import com.example.navigation.TopLevelNav
 import com.example.navigation.navigationModule
 import com.example.profile.api.ProfileRoute
@@ -26,7 +28,7 @@ import org.koin.compose.koinInject
 import org.koin.compose.navigation3.koinEntryProvider
 import org.koin.core.annotation.KoinExperimentalAPI
 
-private val topLevelRoutes: List<NavKey> = listOf(HomeRoute, ProfileRoute)
+private val topLevelRoutes: List<Route> = listOf(HomeRoute, ProfileRoute)
 
 @OptIn(ExperimentalMaterial3Api::class, KoinExperimentalAPI::class)
 @Composable
@@ -44,14 +46,19 @@ fun App(
     }) {
         val navigator: Navigator = koinInject()
 
-        val currentScreen = navigator.backStack.lastOrNull()
+        LaunchedEffect(Unit) {
+            navigator.login() // Llama a login() al iniciar la app
+        }
+
+        val backStack = navigator.combinedBackStack
+        val currentScreen = backStack.lastOrNull()
 
         Scaffold(
             topBar = {
                 if (currentScreen !is LoginRoute) {
                     TopAppBar(
                         navigationIcon = {
-                            if (navigator.backStack.size > 1 && currentScreen !is TopLevelNav && navigator.isLoggedIn) {
+                            if (backStack.size > 1 && currentScreen !is TopLevelNav && navigator.isLoggedIn) {
                                 IconButton(
                                     onClick = { navigator.goBack() }
                                 ) {
@@ -72,18 +79,20 @@ fun App(
                 }
             },
             bottomBar = {
-                if (currentScreen is TopLevelNav && navigator.isLoggedIn) {
+                if ((currentScreen as Route).isTopLevel && navigator.isLoggedIn) {
                     NavigationBar {
                         topLevelRoutes.forEach { route ->
-                            if (route is TopLevelNav) {
+                            if (route.isTopLevel) {
                                 NavigationBarItem(
                                     selected = currentScreen == route,
-                                    onClick = { navigator.goTo(route) },
+                                    onClick = { navigator.navigateTo(route) },
                                     icon = {
-                                        Icon(
-                                            imageVector = vectorResource(route.icon),
-                                            contentDescription = route::class.simpleName
-                                        )
+                                        route.icon ?.let {
+                                            Icon(
+                                                imageVector = vectorResource(it),
+                                                contentDescription = route::class.simpleName
+                                            )
+                                        }
                                     },
                                     label = { Text(route::class.simpleName ?: "") }
                                 )
@@ -95,7 +104,7 @@ fun App(
         ) { paddingValues ->
             NavDisplay(
                 modifier = Modifier.padding(paddingValues),
-                backStack = navigator.backStack,
+                backStack = backStack,
                 onBack = { navigator.goBack() },
                 entryProvider = koinEntryProvider()
             )

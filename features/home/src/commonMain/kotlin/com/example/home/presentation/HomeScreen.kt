@@ -31,7 +31,7 @@ fun HomeScreen(
     ) {
         Text("Home Screen")
         Button(onClick = {
-            navigator.goTo(HomeDetailRoute)
+            navigator.navigateTo(HomeDetailRoute)
         }) {
             Text("Go to Home Detail")
         }

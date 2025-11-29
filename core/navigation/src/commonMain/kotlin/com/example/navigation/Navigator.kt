@@ -5,91 +5,115 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.navigation3.runtime.NavKey
-import kotlin.text.get
+import androidx.compose.runtime.toMutableStateList
 
 
 /**
  * Handles navigation events (forward and back) by updating the navigation state.
  */
 class Navigator(
-    val startDestination: NavKey,
-    private val loginRoute: NavKey
+    private val state: NavigationState,
+    private val loginRoute: Route,
 ) {
-    /**
-     * Interfaz marcadora para rutas que requieren que el usuario esté autenticado.
-     * Cualquier NavKey puede implementarla.
-     */
-    interface RequiresLogin
+    // The route to which the user will be redirected after a successful login.
+    private var onLoginSuccessRoute: Route? = null
 
-    private var onLoginSuccessRoute: NavKey? = null
-
-    // Estado de autenticación, observable por Compose.
+    // The login state can be here or in a user repository.
     var isLoggedIn by mutableStateOf(false)
         private set
 
-    // La pila de navegación, observable por Compose.
-    val backStack: SnapshotStateList<NavKey> = mutableStateListOf(startDestination)
+    // Exposes the combined navigation stack for the UI to observe.
+    val combinedBackStack: SnapshotStateList<Route>
+        get() = if (isLoggedIn) {
+            val stacksInUse = if (state.currentTopLevelRoute == state.startRoute) {
+                listOf(state.startRoute)
+            } else {
+                listOf(state.startRoute, state.currentTopLevelRoute)
+            }
+            stacksInUse.flatMap { state.backStacks[it] ?: emptyList() }.toMutableStateList()
+        } else {
+            listOf(loginRoute).toMutableStateList()
+        }
 
     init {
-        if (startDestination is RequiresLogin && !isLoggedIn) {
-            onLoginSuccessRoute = startDestination
-            backStack.add(loginRoute)
-        } else {
-            backStack.add(startDestination)
+        // Initial logic to force login if necessary.
+        handleInitialLoginCheck()
+    }
+
+    private fun handleInitialLoginCheck() {
+        if (state.startRoute.requiresLogin && !isLoggedIn) {
+            onLoginSuccessRoute = state.startRoute
         }
     }
+
     /**
-     * Navega a un nuevo destino.
-     * Si el destino requiere login y el usuario no está autenticado,
-     * guarda el destino y redirige a la pantalla de login.
+     * Navigates to a destination. This is the main method that should be called.
      */
-    fun goTo(destination: NavKey) {
-        // Redirect to Login if it's necessary
-        if (destination is RequiresLogin && !isLoggedIn) {
+    fun navigateTo(destination: Route) {
+        // --- 1. Authentication Logic ---
+        if (destination.requiresLogin && !isLoggedIn) {
             onLoginSuccessRoute = destination
-            backStack.add(loginRoute)
+            // We don't need to do anything else; `combinedBackStack` will already return only the loginRoute.
             return
         }
 
-        // Si el usuario navega explícitamente a login, no hay redirección posterior.
         if (destination == loginRoute) {
             onLoginSuccessRoute = null
         }
 
-        backStack.add(destination)
+        // --- 2. Stack Navigation Logic ---
+        if (destination in state.topLevelRoutes) {
+            // It's a top-level route (a tab), we just switch to it.
+            state.currentTopLevelRoute = destination
+        } else {
+            // It's a detail route, we add it to the active tab's stack.
+            state.backStacks[state.currentTopLevelRoute]?.add(destination)
+        }
     }
 
     /**
-     * Vuelve a la pantalla anterior en la pila.
+     * Navigates back in the current stack.
      */
     fun goBack() {
-        backStack.removeLastOrNull()
+        val currentStack = state.backStacks[state.currentTopLevelRoute]
+            ?: error("Navigation stack not found for ${state.currentTopLevelRoute}")
+
+        // If the current stack has only 1 element (the top-level route itself),
+        // and we are NOT on the start route, we go back to the start route.
+        if (currentStack.size <= 1 && state.currentTopLevelRoute != state.startRoute) {
+            state.currentTopLevelRoute = state.startRoute
+        } else if (currentStack.size > 1) {
+            // --- CRASH FIX! ---
+            // We use removeAt(lastIndex) which is compatible with all Android versions.
+            currentStack.removeAt(currentStack.lastIndex)
+        }
+        // If we are on the start stack and only 1 element is left, we do nothing (the user will exit the app).
     }
 
     /**
-     * Marca al usuario como autenticado y navega al destino guardado si existe.
+     * Marks the user as logged in and handles redirection.
      */
     fun login() {
         isLoggedIn = true
-
-        onLoginSuccessRoute?.let { destination ->
-            backStack.remove(loginRoute)
-            backStack.add(destination)
+        onLoginSuccessRoute?.let {
+            navigateTo(it)
             onLoginSuccessRoute = null
         }
     }
 
     /**
-     * Cierra la sesión del usuario y elimina todas las pantallas protegidas de la pila.
+     * Logs out the user and clears the state.
      */
     fun logout() {
         isLoggedIn = false
-        backStack.removeAll { it is RequiresLogin }
-        if (backStack.isEmpty()) {
-            backStack.add(loginRoute)
-            onLoginSuccessRoute = startDestination
+        // We reset the stacks to their initial state.
+        state.topLevelRoutes.forEach { route ->
+            // Instead of casting, we create a new SnapshotStateList.
+            state.backStacks[route] = mutableListOf(route).toMutableStateList()
         }
+        // We return to the start tab.
+        state.currentTopLevelRoute = state.startRoute
+        // We check if the start route requires login to redirect if necessary.
+        handleInitialLoginCheck()
     }
 }
-

@@ -1,7 +1,7 @@
 package com.example.login.api
 
-import androidx.navigation3.runtime.NavKey
+import com.example.navigation.Route
 import kotlinx.serialization.Serializable
 
 
-@Serializable object LoginRoute : NavKey
+@Serializable object LoginRoute : Route()

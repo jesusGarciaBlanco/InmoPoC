@@ -29,8 +29,12 @@ fun ProfileScreen(onLogout: () -> Unit) {
             .clip(RoundedCornerShape(48.dp))
     ) {
         Text("Profile Screen")
+        Text(
+            "User is logged in: ${navigator.isLoggedIn}",
+            color = if (navigator.isLoggedIn) Color.Green else Color.White
+        )
         Button(onClick = {
-            navigator.goTo(ProfileDetailRoute)
+            navigator.navigateTo(ProfileDetailRoute)
         }) {
             Text("Go to Profile Detail")
         }
