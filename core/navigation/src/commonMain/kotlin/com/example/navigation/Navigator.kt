@@ -63,7 +63,7 @@ class Navigator(
             onLoginSuccessRoute = null
         }
 
-        // --- 2. Stack Navigation Logic ---
+        // --- Stack Navigation Logic ---
         if (destination in state.topLevelRoutes) {
             // It's a top-level route (a tab), we just switch to it.
             state.currentTopLevelRoute = destination
@@ -78,19 +78,32 @@ class Navigator(
      * Navigates back in the current stack.
      */
     fun goBack() {
-        val currentStack = state.backStacks[state.currentTopLevelRoute]
-            ?: error("Navigation stack not found for ${state.currentTopLevelRoute}")
+        // Determine the active stack based on the login state.
+        val activeStackKey = if (isLoggedIn) state.currentTopLevelRoute else loginRoute
+        val currentStack = state.backStacks[activeStackKey]
+            ?: error("Navigation stack not found for $activeStackKey")
 
-        // If the current stack has only 1 element (the top-level route itself),
-        // and we are NOT on the start route, we go back to the start route.
-        if (currentStack.size <= 1 && state.currentTopLevelRoute != state.startRoute) {
-            state.currentTopLevelRoute = state.startRoute
-        } else if (currentStack.size > 1) {
-            // --- CRASH FIX! ---
-            // We use removeAt(lastIndex) which is compatible with all Android versions.
-            currentStack.removeAt(currentStack.lastIndex)
+        // Back navigation logic for a LOGGED-IN user.
+        if (isLoggedIn) {
+            // If the current stack has only 1 element (the top-level route itself),
+            // and we are NOT on the start route, we go back to the start route.
+            if (currentStack.size <= 1 && state.currentTopLevelRoute != state.startRoute) {
+                state.currentTopLevelRoute = state.startRoute
+            } else if (currentStack.size > 1) {
+                // If the stack has more than one element, we just remove the last one.
+                currentStack.removeAt(currentStack.lastIndex)
+            }
+            // If we are on the start stack with 1 element, we do nothing (the user will exit the app).
         }
-        // If we are on the start stack and only 1 element is left, we do nothing (the user will exit the app).
+        // 3. Back navigation logic for a NOT-LOGGED-IN user.
+        else {
+            // If the stack (which will be the login stack) has more than one element (e.g., Login -> Register),
+            // we just remove the last one to go back to the previous one.
+            if (currentStack.size > 1) {
+                currentStack.removeAt(currentStack.lastIndex)
+            }
+            // If only one element is left (Login), we do nothing to prevent the user from exiting the app.
+        }
     }
 
     /**
