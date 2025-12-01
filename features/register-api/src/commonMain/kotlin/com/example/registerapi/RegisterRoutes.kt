@@ -8,8 +8,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable object LegalNameRoute: Route()
 
-@Serializable object LegalAddressRoute: Route()
+@Serializable data class LegalAddressRoute(
+    val legalName: String,
+): Route()
 
-@Serializable object LegalResumeRoute: Route()
+@Serializable data class LegalResumeRoute(
+    val legalName: String,
+    val legalAddress: String,
+): Route()
 
 @Serializable object FinishRoute: Route()

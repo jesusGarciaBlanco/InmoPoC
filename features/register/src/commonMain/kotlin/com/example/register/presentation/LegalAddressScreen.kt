@@ -8,6 +8,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,8 +22,9 @@ import com.example.registerapi.RegisterRoute
 import org.koin.compose.koinInject
 
 @Composable
-fun LegalAddressScreen() {
+fun LegalAddressScreen(legalName: String) {
     val navigator: Navigator = koinInject()
+    var legalAddress by remember { mutableStateOf("") }
     Column(
     modifier = Modifier.fillMaxSize().background(Color.Cyan),
     horizontalAlignment = Alignment.CenterHorizontally,
@@ -28,13 +33,15 @@ fun LegalAddressScreen() {
         Text("Legal Address Screen")
 
         TextField(
-            value = "",
-            onValueChange = {},
+            value = legalAddress,
+            onValueChange = {legalAddress = it},
             label = { Text("Legal Address") }
         )
 
         Button(onClick = {
-            navigator.navigateTo(LegalResumeRoute)
+            navigator.navigateTo(LegalResumeRoute(
+                legalName = legalName,
+                legalAddress = legalAddress))
         }){
             Text("Navigate to Legal Resume Screen")
         }

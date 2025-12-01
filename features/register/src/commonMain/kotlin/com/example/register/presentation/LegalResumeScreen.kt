@@ -16,7 +16,8 @@ import com.example.registerapi.LegalNameRoute
 import org.koin.compose.koinInject
 
 @Composable
-fun LegalResumeScreen() {
+fun LegalResumeScreen(legalName: String, legalAddress: String,
+) {
     val navigator: Navigator = koinInject()
     Column(
     modifier = Modifier.fillMaxSize().background(Color.Gray),
@@ -25,6 +26,8 @@ fun LegalResumeScreen() {
     ) {
         Text("Legal Resume Screen")
 
+        Text("LegalName = $legalName")
+        Text("LegalAddress = $legalAddress")
         Button(onClick = {
             navigator.navigateTo(destination = FinishRoute, popupTo = LegalNameRoute, inclusive = true)
         }){

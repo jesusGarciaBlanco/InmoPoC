@@ -25,11 +25,14 @@ val registerModule = module {
     navigation<LegalNameRoute>{
         LegalNameScreen()
     }
-    navigation<LegalAddressRoute>{
-        LegalAddressScreen()
+    navigation<LegalAddressRoute>{ route ->
+        LegalAddressScreen(route.legalName)
     }
-    navigation<LegalResumeRoute>{
-        LegalResumeScreen()
+    navigation<LegalResumeRoute>{ route ->
+        LegalResumeScreen(
+            legalName = route.legalName,
+            legalAddress = route.legalAddress
+        )
     }
     navigation<FinishRoute>{
         FinishScreen()

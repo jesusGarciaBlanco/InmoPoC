@@ -8,6 +8,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,6 +23,7 @@ import org.koin.compose.koinInject
 @Composable
 fun LegalNameScreen() {
     val navigator: Navigator = koinInject()
+    var legalName by remember { mutableStateOf("") }
     Column(
         modifier = Modifier.fillMaxSize().background(Color.Blue),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -27,13 +32,13 @@ fun LegalNameScreen() {
         Text("Legal Name Screen")
 
         TextField(
-            value = "",
-            onValueChange = {},
+            value = legalName,
+            onValueChange = {legalName = it},
             label = { Text("Legal Name") }
         )
 
         Button(onClick = {
-            navigator.navigateTo(LegalAddressRoute)
+            navigator.navigateTo(LegalAddressRoute(legalName))
         }){
             Text("Navigate to Legal Address Screen")
         }
