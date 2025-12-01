@@ -1,19 +1,19 @@
 package com.example.inmopoc.di
 
 
-import com.example.home.api.HomeRoute
-import com.example.login.api.LoginRoute
 import com.example.navigation.NavigationState
 import com.example.navigation.Navigator
-import com.example.profile.api.ProfileRoute
+import com.example.navigationapi.routes.HomeRoutes
+import com.example.navigationapi.routes.LoginRoutes
+import com.example.navigationapi.routes.ProfileRoutes
 import org.koin.dsl.module
 
 val appModule = module {
     single {
-        val topLevelRoutes = setOf(HomeRoute, ProfileRoute)
+        val topLevelRoutes = setOf(HomeRoutes.Home, ProfileRoutes.Home)
 
         NavigationState(
-            startRoute = HomeRoute,
+            startRoute = HomeRoutes.Home,
             topLevelRoutes = topLevelRoutes
         )
     }
@@ -21,7 +21,7 @@ val appModule = module {
     single {
         Navigator(
             state = get(),
-            loginRoute = LoginRoute
+            loginRoute = LoginRoutes.Login
         )
     }
 }

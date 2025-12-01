@@ -11,23 +11,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.navigationapi.controller.NavEventController
+import com.example.navigationapi.event.Event
+import com.example.navigationapi.event.LoginEvent
+import org.koin.compose.koinInject
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit,
-    onRegisterClick: () -> Unit,
 ) {
+    val navEventController: NavEventController = koinInject()
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text("Login Screen")
-        Button(onClick = onLoginSuccess) {
+        Button(onClick = {
+            navEventController.sendEvent(Event.OnLogin)
+        }) {
             Text("Log In")
         }
         Spacer(modifier = Modifier.height(8.dp))
-        Button(onClick = onRegisterClick) {
+        Button(onClick = {
+            navEventController.sendEvent(LoginEvent.OnRegisterClick)
+        }) {
             Text("Register")
         }
     }

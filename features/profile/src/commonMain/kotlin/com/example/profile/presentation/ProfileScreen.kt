@@ -13,13 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.navigation.Navigator
-import com.example.profile.api.ProfileDetailRoute
+import com.example.navigationapi.controller.NavEventController
+import com.example.navigationapi.event.Event
+import com.example.navigationapi.event.ProfileEvent
 import org.koin.compose.koinInject
 
 @Composable
-fun ProfileScreen(onLogout: () -> Unit) {
-    val navigator: Navigator = koinInject()
+fun ProfileScreen() {
+    val navEventController: NavEventController = koinInject()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -29,16 +30,14 @@ fun ProfileScreen(onLogout: () -> Unit) {
             .clip(RoundedCornerShape(48.dp))
     ) {
         Text("Profile Screen")
-        Text(
-            "User is logged in: ${navigator.isLoggedIn}",
-            color = if (navigator.isLoggedIn) Color.Green else Color.White
-        )
         Button(onClick = {
-            navigator.navigateTo(ProfileDetailRoute)
+            navEventController.sendEvent(ProfileEvent.OnProfileDetailClick)
         }) {
             Text("Go to Profile Detail")
         }
-        Button(onClick = onLogout) {
+        Button(onClick = {
+            navEventController.sendEvent(Event.OnLogout)
+        }) {
             Text("Logout")
         }
     }

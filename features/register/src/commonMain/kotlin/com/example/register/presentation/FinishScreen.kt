@@ -10,28 +10,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.example.navigation.Navigator
-import com.example.registerapi.FinishRoute
+import com.example.navigationapi.controller.NavEventController
+import com.example.navigationapi.event.Event
+import com.example.navigationapi.event.RegisterEvent
 import org.koin.compose.koinInject
 
 @Composable
 fun FinishScreen() {
-    val navigator: Navigator = koinInject()
     Column(
     modifier = Modifier.fillMaxSize().background(Color.Yellow),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center
     ) {
+        val navEventController: NavEventController = koinInject()
         Text("Finish Screen")
 
         Button(onClick = {
-            navigator.goBack()
+            navEventController.sendEvent(Event.OnBack)
         }){
             Text("go back")
         }
 
         Button(onClick = {
-            navigator.goBackTo(FinishRoute, inclusive = true)
+            navEventController.sendEvent(RegisterEvent.OnCloseRegisterFlow)
         }){
             Text("close flow")
         }

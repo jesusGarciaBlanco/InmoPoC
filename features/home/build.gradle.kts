@@ -42,7 +42,7 @@ kotlin {
             implementation(libs.bundles.koin)
 
             implementation(projects.resources)
-            implementation(projects.core.navigation)
+            implementation(projects.core.navigationApi)
         }
 
         commonTest.dependencies {

@@ -15,15 +15,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.example.navigation.Navigator
-import com.example.registerapi.LegalAddressRoute
-import com.example.registerapi.LegalResumeRoute
-import com.example.registerapi.RegisterRoute
+import com.example.navigationapi.controller.NavEventController
+import com.example.navigationapi.event.Event
+import com.example.navigationapi.event.RegisterEvent
 import org.koin.compose.koinInject
 
 @Composable
 fun LegalAddressScreen(legalName: String) {
-    val navigator: Navigator = koinInject()
+    val navEventController: NavEventController = koinInject()
     var legalAddress by remember { mutableStateOf("") }
     Column(
     modifier = Modifier.fillMaxSize().background(Color.Cyan),
@@ -39,19 +38,19 @@ fun LegalAddressScreen(legalName: String) {
         )
 
         Button(onClick = {
-            navigator.navigateTo(LegalResumeRoute(
+            navEventController.sendEvent(RegisterEvent.OnLegalResumeClick(
                 legalName = legalName,
                 legalAddress = legalAddress))
         }){
             Text("Navigate to Legal Resume Screen")
         }
         Button(onClick = {
-            navigator.goBack()
+            navEventController.sendEvent(Event.OnBack)
         }){
             Text("go back")
         }
         Button(onClick = {
-            navigator.goBackTo(RegisterRoute)
+            navEventController.sendEvent(RegisterEvent.OnCloseRegisterFlow)
         }){
             Text("close flow")
         }

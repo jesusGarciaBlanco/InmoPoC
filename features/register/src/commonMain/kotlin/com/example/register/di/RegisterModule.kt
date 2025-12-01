@@ -1,16 +1,11 @@
 package com.example.register.di
 
-import com.example.navigation.Navigator
+import com.example.navigationapi.routes.RegisterRoutes
 import com.example.register.presentation.FinishScreen
 import com.example.register.presentation.LegalAddressScreen
 import com.example.register.presentation.LegalNameScreen
 import com.example.register.presentation.LegalResumeScreen
 import com.example.register.presentation.RegisterScreen
-import com.example.registerapi.FinishRoute
-import com.example.registerapi.LegalAddressRoute
-import com.example.registerapi.LegalNameRoute
-import com.example.registerapi.LegalResumeRoute
-import com.example.registerapi.RegisterRoute
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.dsl.module
 import org.koin.dsl.navigation3.navigation
@@ -18,23 +13,22 @@ import org.koin.dsl.navigation3.navigation
 
 @OptIn(KoinExperimentalAPI::class)
 val registerModule = module {
-    navigation<RegisterRoute> {
-        val navigator: Navigator = get()
+    navigation<RegisterRoutes.RegisterHome> {
         RegisterScreen()
     }
-    navigation<LegalNameRoute>{
+    navigation<RegisterRoutes.LegalName>{
         LegalNameScreen()
     }
-    navigation<LegalAddressRoute>{ route ->
+    navigation<RegisterRoutes.LegalAddress>{ route ->
         LegalAddressScreen(route.legalName)
     }
-    navigation<LegalResumeRoute>{ route ->
+    navigation<RegisterRoutes.LegalResume>{ route ->
         LegalResumeScreen(
             legalName = route.legalName,
             legalAddress = route.legalAddress
         )
     }
-    navigation<FinishRoute>{
+    navigation<RegisterRoutes.Finish>{
         FinishScreen()
     }
 }

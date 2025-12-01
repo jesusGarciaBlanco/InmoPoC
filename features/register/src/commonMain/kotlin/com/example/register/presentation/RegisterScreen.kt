@@ -10,13 +10,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.example.navigation.Navigator
-import com.example.registerapi.LegalNameRoute
+import com.example.navigationapi.controller.NavEventController
+import com.example.navigationapi.event.RegisterEvent
 import org.koin.compose.koinInject
 
 @Composable
 fun RegisterScreen() {
-    val navigator: Navigator = koinInject()
+    val navEventController: NavEventController = koinInject()
     Column(
         modifier = Modifier.fillMaxSize().background(Color.Blue),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -24,7 +24,8 @@ fun RegisterScreen() {
     ) {
         Text("Register Screen")
 
-        Button(onClick = {navigator.navigateTo(LegalNameRoute)}){
+        Button(onClick = {
+            navEventController.sendEvent(RegisterEvent.OnStartRegisterProcessClick) }){
             Text(text = "start register flow")
         }
     }

@@ -40,6 +40,8 @@ kotlin {
             implementation(libs.androidx.material3.adaptive)
             implementation(libs.androidx.material3.adaptive.nav3)
             implementation(libs.bundles.koin)
+
+            implementation(projects.core.navigationApi)
         }
 
         commonTest.dependencies {

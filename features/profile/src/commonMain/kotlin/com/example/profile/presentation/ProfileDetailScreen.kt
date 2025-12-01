@@ -13,9 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.navigationapi.controller.NavEventController
+import com.example.navigationapi.event.Event
+import org.koin.compose.koinInject
 
 @Composable
-fun ProfileDetailScreen(onLogout: () -> Unit) {
+fun ProfileDetailScreen() {
+    val navEventController: NavEventController = koinInject()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -25,7 +29,9 @@ fun ProfileDetailScreen(onLogout: () -> Unit) {
             .clip(RoundedCornerShape(48.dp))
     ) {
         Text("Profile Detail Screen")
-        Button(onClick = onLogout ) {
+        Button(onClick = {
+            navEventController.sendEvent(Event.OnLogout)
+        } ) {
             Text("Logout")
         }
     }

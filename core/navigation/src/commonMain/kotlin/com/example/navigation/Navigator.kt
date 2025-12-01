@@ -6,7 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
-
+import com.example.navigationapi.routes.Route
+import com.example.navigationapi.marker.RequiresLogin
 
 /**
  * Handles navigation events (forward and back) by updating the navigation state.
@@ -44,7 +45,7 @@ class Navigator(
     }
 
     private fun handleInitialLoginCheck() {
-        if (state.startRoute.requiresLogin && !isLoggedIn) {
+        if (state.startRoute is RequiresLogin && !isLoggedIn) {
             onLoginSuccessRoute = state.startRoute
         }
     }
@@ -53,12 +54,13 @@ class Navigator(
      * Navigates to a destination. This is the main method that should be called.
      */
     fun navigateTo(destination: Route) {
-        if (destination.requiresLogin && !isLoggedIn) {
+        if (destination is RequiresLogin && !isLoggedIn) {
             onLoginSuccessRoute = destination
             // We don't need to do anything else; `combinedBackStack` will already return only the loginRoute.
             return
         }
 
+        // Si el usuario navega explícitamente a login, no hay redirección posterior.
         if (destination == loginRoute) {
             onLoginSuccessRoute = null
         }

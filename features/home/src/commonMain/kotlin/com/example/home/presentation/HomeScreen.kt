@@ -13,14 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.home.api.HomeDetailRoute
-import com.example.navigation.Navigator
+import com.example.navigationapi.controller.NavEventController
+import com.example.navigationapi.event.HomeEvent
 import org.koin.compose.koinInject
 
 @Composable
 fun HomeScreen(
 ) {
-    val navigator: Navigator = koinInject()
+    val navEventController: NavEventController = koinInject()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -31,7 +31,7 @@ fun HomeScreen(
     ) {
         Text("Home Screen")
         Button(onClick = {
-            navigator.navigateTo(HomeDetailRoute)
+            navEventController.sendEvent(HomeEvent.OnHomeDetailClick)
         }) {
             Text("Go to Home Detail")
         }

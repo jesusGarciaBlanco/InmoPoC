@@ -46,6 +46,7 @@ kotlin {
             implementation(projects.features.profile)
             implementation(projects.features.register)
             implementation(projects.core.navigation)
+            implementation(projects.core.navigationApi)
             implementation(projects.resources)
 
         }

@@ -10,15 +10,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.example.navigation.Navigator
-import com.example.registerapi.FinishRoute
-import com.example.registerapi.LegalNameRoute
+import com.example.navigationapi.controller.NavEventController
+import com.example.navigationapi.event.Event
+import com.example.navigationapi.event.RegisterEvent
 import org.koin.compose.koinInject
 
 @Composable
 fun LegalResumeScreen(legalName: String, legalAddress: String,
 ) {
-    val navigator: Navigator = koinInject()
+    val navEventController: NavEventController = koinInject()
     Column(
     modifier = Modifier.fillMaxSize().background(Color.Gray),
     horizontalAlignment = Alignment.CenterHorizontally,
@@ -29,17 +29,17 @@ fun LegalResumeScreen(legalName: String, legalAddress: String,
         Text("LegalName = $legalName")
         Text("LegalAddress = $legalAddress")
         Button(onClick = {
-            navigator.navigateTo(destination = FinishRoute, popupTo = LegalNameRoute, inclusive = true)
+            navEventController.sendEvent(RegisterEvent.OnRegistrationComplete)
         }){
             Text("Navigate Finish Screen")
         }
         Button(onClick = {
-            navigator.goBack()
+            navEventController.sendEvent(Event.OnBack)
         }){
             Text("go back")
         }
         Button(onClick = {
-            navigator.goBackTo(LegalNameRoute, inclusive = true)
+            navEventController.sendEvent(RegisterEvent.OnCloseRegisterFlow)
         }){
             Text("close flow")
         }
