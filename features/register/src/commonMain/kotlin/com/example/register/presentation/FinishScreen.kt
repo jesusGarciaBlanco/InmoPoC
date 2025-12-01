@@ -11,21 +11,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.navigation.Navigator
-import com.example.registerapi.LegalNameRoute
+import com.example.registerapi.FinishRoute
 import org.koin.compose.koinInject
 
 @Composable
-fun RegisterScreen() {
+fun FinishScreen() {
     val navigator: Navigator = koinInject()
     Column(
-        modifier = Modifier.fillMaxSize().background(Color.Blue),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    modifier = Modifier.fillMaxSize().background(Color.Yellow),
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.Center
     ) {
-        Text("Register Screen")
+        Text("Finish Screen")
 
-        Button(onClick = {navigator.navigateTo(LegalNameRoute)}){
-            Text(text = "start register flow")
+        Button(onClick = {
+            navigator.goBack()
+        }){
+            Text("go back")
+        }
+
+        Button(onClick = {
+            navigator.goBackTo(FinishRoute, inclusive = true)
+        }){
+            Text("close flow")
         }
     }
 }

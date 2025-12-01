@@ -75,6 +75,43 @@ class Navigator(
     }
 
     /**
+     * Navigates to a destination, clearing the back stack up to a specific route beforehand.
+     *
+     * @param destination The new route to navigate to.
+     * @param popupTo The route to pop the stack up to.
+     * @param inclusive If true, the `popupTo` route itself will also be removed from the stack.
+     */
+    fun navigateTo(destination: Route, popupTo: Route, inclusive: Boolean = false) {
+        // First, handle the pop operation.
+        // Determine which stack we need to modify.
+        val activeStackKey = if (isLoggedIn) state.currentTopLevelRoute else loginRoute
+        val currentStack = state.backStacks[activeStackKey]
+            ?: error("Navigation stack not found for $activeStackKey")
+
+        // Find the index of the `popupTo` route in the current stack.
+        val popupToIndex = currentStack.indexOf(popupTo)
+
+        if (popupToIndex != -1) {
+            // Calculate the index of the last element to keep.
+            // If inclusive is true, we pop up to and including the element, so we keep elements up to the one *before* it.
+            // If inclusive is false, we keep the `popupTo` element itself.
+            val lastIndexToKeep = if (inclusive) popupToIndex - 1 else popupToIndex
+
+            // If lastIndexToKeep is valid, remove all elements after it.
+            if (lastIndexToKeep < currentStack.size - 1) {
+                // We remove from the end backwards to avoid index shifting issues.
+                // The range is from the last element down to the one just after `lastIndexToKeep`.
+                for (i in currentStack.lastIndex downTo lastIndexToKeep + 1) {
+                    currentStack.removeAt(i)
+                }
+            }
+        }
+
+        // After popping, perform the regular navigation to the destination.
+        navigateTo(destination)
+    }
+
+    /**
      * Navigates back in the current stack.
      */
     fun goBack() {
@@ -103,6 +140,42 @@ class Navigator(
                 currentStack.removeAt(currentStack.lastIndex)
             }
             // If only one element is left (Login), we do nothing to prevent the user from exiting the app.
+        }
+    }
+
+    /**
+     * Goes back in the stack to a specific destination, clearing all routes in between.
+     *
+     * @param destination The route to go back to.
+     * @param inclusive If true, the `destination` route itself will also be removed, going back to the screen before it.
+     */
+    fun goBackTo(destination: Route, inclusive: Boolean = false) {
+        // Determine which stack we are operating on.
+        val activeStackKey = if (isLoggedIn) state.currentTopLevelRoute else loginRoute
+        val currentStack = state.backStacks[activeStackKey]
+            ?: error("Navigation stack not found for $activeStackKey")
+
+        // Find the index of the destination route in the current stack.
+        val destinationIndex = currentStack.indexOf(destination)
+
+        // If the destination is not found, we can't do anything.
+        if (destinationIndex == -1) {
+            // Optional: Log a warning or error.
+            // For now, we do nothing.
+            return
+        }
+
+        // Calculate the target index to pop down to.
+        // If inclusive, we want to remove the destination as well, so the target is the one *before* it.
+        // If not inclusive, the destination is the last element we want to see, so we don't remove it.
+        val targetIndex = if (inclusive) destinationIndex -1 else destinationIndex
+
+        // We only proceed if there are elements to remove.
+        if (targetIndex < currentStack.size - 1) {
+            // Remove all elements from the end of the list down to the one after our target.
+            for (i in currentStack.lastIndex downTo targetIndex + 1) {
+                currentStack.removeAt(i)
+            }
         }
     }
 

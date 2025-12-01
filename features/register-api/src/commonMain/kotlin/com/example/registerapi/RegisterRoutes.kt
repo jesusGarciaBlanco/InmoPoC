@@ -5,3 +5,11 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable object RegisterRoute : Route()
+
+@Serializable object LegalNameRoute: Route()
+
+@Serializable object LegalAddressRoute: Route()
+
+@Serializable object LegalResumeRoute: Route()
+
+@Serializable object FinishRoute: Route()
